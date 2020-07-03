@@ -28,8 +28,8 @@ def normalization_of_polygon_collection(polygon_collection, bbox):
 def normalization_of_node_collection(node_collection, bbox):
     node_collection = list(map(lambda x: [int(round(x[1]-bbox[0], 3)*RESOLUTION_FACTOR), int(
         round(x[0]-bbox[1], 3)*RESOLUTION_FACTOR)], node_collection))
-    node_collection = list(map(lambda x: Point(x), node_collection))
-    return (node_collection)
+    node_collection = set(map(lambda x: (x[0], x[1]), node_collection))
+    return(node_collection)
 
 
 def noramalizatioin_of_line_collection(line_collection, bbox):
@@ -114,7 +114,7 @@ def find_matrix(boundary_box, tags, custom_circles_list):
             nodes_collection = list(
                 map(lambda x: x["geometry"]["coordinates"], node_points))
             # converting real world coordinates to normalized coordinates to plot on matrix indexes(index can be [0 to n] and only positive integer)
-            nodes_list = normalization_of_node_collection(
+            nodes_set = normalization_of_node_collection(
                 nodes_collection, BOUNDARY_BOX)
         custom_markers_list = normalization_of_custommarker_collection(
             custom_circles_list, BOUNDARY_BOX)
@@ -160,8 +160,8 @@ def find_matrix(boundary_box, tags, custom_circles_list):
     if(tags.get("school_hospitals", False)):
         for i in range(0, len(matrix)):
             for j in range(0, len(matrix[0])):
-                point = Point(i, j)
-                if(point in nodes_list):
+                point = (i, j)
+                if(point in nodes_set):
                     matrix[i][j]["s_h"] = 1
 
     # filling custom markers in matrix
