@@ -8,20 +8,6 @@ import json
 # Create your views here.
 
 '''
-Sample Input Data:
-{
-"source":[ 24.419642928396613, 78.1512451171875],
-"destination":[ 24.530050090109015,78.58245849609375]
-}
-
-{
-"source":[ 24.419642928396613, 78.1512451171875],
-"destination":[ 24.450050090109015,78.28245849609375],
-"intermediate_stops":[[24.4600,78.190344],[24.4600,78.190344],[24.4600,78.190344]],
-"buffer_radius_km":1,
-"tags":{"flyzone":true,"water":true,"forest":true,"school_hospitals":true,"population":true},
-"custom_restriction_markers":[[3,4,4],[4,34,4],[34,43,4],[34,4,55],[34,4,5]]
-}
 
 KOTA
 
@@ -31,9 +17,9 @@ KOTA
 "intermediate_stops":[[25.154545,75.84234],[25.15523,75.8616256]],
 "buffer_radius_km":1,
 "tags":{"flyzone":true,"water":true,"forest":true,"school_hospitals":true,"population":true},
-"custom_restriction_markers":[[25.15523,75.8616256,100]]
+"custom_restriction_markers":[[25.15523,75.8616256,100]],
+"optimum_path":true
 }
-
 '''
 
 
@@ -52,6 +38,7 @@ class FindPathView(APIView):
         tags = request.data.get("tags")
         custom_restriction_markers = request.data.get(
             "custom_restriction_markers")
+        optimum_path = request.data.get("optimum_path")
         # check validity of points
         try:
             # finding boundaries of area for data extraction.
@@ -88,6 +75,6 @@ class FindPathView(APIView):
             boundary_box, tags, custom_restriction_markers, path_nodes)
         print("raster matrix formation successfull.")
         result_dict = find_shortest_path(
-            matrix, normalized_path_nodes)
+            matrix, normalized_path_nodes, optimum_path)
 
         return Response(json.dumps(result_dict), status=HTTP_200_OK)

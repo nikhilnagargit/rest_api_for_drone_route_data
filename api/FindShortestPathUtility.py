@@ -519,15 +519,14 @@ def get_lat_lon_path(path):
 ###################################################################################################
 
 
-def find_shortest_path(matrix, normalized_path_nodes):
+def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
     global output, rows, columns, water_matrix, forest_matrix, population_matrix, building_matrix
     global latitude_matrix, longitude_matrix, traps, threshold_population, type_of_distance
     global start_point, final_point, points, size_of_grid, total_distance_km, total_path, total_distances
     global x_len, y_len
     output = matrix
     ans = {}
-    optimum = False
-    print("\n\n", normalized_path_nodes, "\n\n")
+    optimum = optimum_bool
     start_point = normalized_path_nodes[0]
     final_point = normalized_path_nodes[-1]
     points = normalized_path_nodes[1:-1]
@@ -543,7 +542,7 @@ def find_shortest_path(matrix, normalized_path_nodes):
     x_len, y_len = len(water_matrix), len(water_matrix[0])
     threshold_population = 0.5  # Threshold Population density
     type_of_distance = True  # True = Euclidean Distance and False = Manhattan Distance
-    size_of_grid = 1  # size of grid is the dimension of grid by default it is 11m*11m
+    size_of_grid = 11  # size of grid is the dimension of grid by default it is 11m*11m
     for row in range(0, rows):
         for column in range(0, columns):
             water_matrix[row][column] = output[row][column]['w']
@@ -557,6 +556,9 @@ def find_shortest_path(matrix, normalized_path_nodes):
             longitude_matrix[row][column] = output[row][column]['lon']
     traps = [[0 for i in range(y_len)] for j in range(x_len)]
     if optimum:
+        start_point = normalized_path_nodes[0]
+        final_point = normalized_path_nodes[-1]
+        points = normalized_path_nodes[1:-1]
         total_points_1 = [start_point]
         total_points_1 = optimum_path(total_points_1, points, final_point)
         total_distance_km_1 = 0
@@ -579,6 +581,9 @@ def find_shortest_path(matrix, normalized_path_nodes):
                 print("No possible path")
 
         if total_distance_km_1 < total_distance_km_2:
+            start_point = normalized_path_nodes[0]
+            final_point = normalized_path_nodes[-1]
+            points = normalized_path_nodes[1:-1]
             total_points = [start_point]
             total_points = optimum_path(total_points, points, final_point)
             for point in total_points:
@@ -598,6 +603,9 @@ def find_shortest_path(matrix, normalized_path_nodes):
                 else:
                     print("No possible path")
         else:
+            start_point = normalized_path_nodes[0]
+            final_point = normalized_path_nodes[-1]
+            points = normalized_path_nodes[1:-1]
             total_points = [final_point]
             total_points = optimum_path(total_points, points, start_point)
 
@@ -620,6 +628,9 @@ def find_shortest_path(matrix, normalized_path_nodes):
                     print("No possible path")
             total_points.reverse()
     else:
+        start_point = normalized_path_nodes[0]
+        final_point = normalized_path_nodes[-1]
+        points = normalized_path_nodes[1:-1]
         total_points = [start_point]
         for p in points:
             total_points.append(p)
