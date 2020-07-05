@@ -47,6 +47,14 @@ def normalization_of_custommarker_collection(marker_collection, bbox):
     return(marker_collection)
 
 
+def normalization_of_path_collection(path_collection, bbox):
+    path_collection = list(map(lambda x: [int(round(x[0]-bbox[0], 3)*RESOLUTION_FACTOR), int(
+        round(x[1]-bbox[1], 3)*RESOLUTION_FACTOR)], path_collection))
+    path_collection = list(
+        map(lambda x: [x[0], x[1]], path_collection))
+    return(path_collection)
+
+
 def get_water_data(BOUNDARY_BOX):
     bbox = f"{BOUNDARY_BOX[0]},{BOUNDARY_BOX[1]},{BOUNDARY_BOX[2]},{BOUNDARY_BOX[3]}"
     water_query = f"[out:json][timeout:100];(way[waterway]({bbox});node[water]({bbox});way['water'='lake']({bbox});way[natural=water]({bbox});relation[natural=water]({bbox}););out body;>;out skel qt;"
@@ -82,8 +90,10 @@ def get_node_data(BOUNDARY_BOX):
             node_points.append(i)
     return(node_points)
 
+######################################### MAIN FUNCTION ##########################################################
 
-def find_matrix(boundary_box, tags, custom_circles_list):
+
+def find_matrix(boundary_box, tags, custom_circles_list, path_nodes):
     print("getting data from api")
     global BOUNDARY_BOX, RESOLUTION_FACTOR, RESOLUTION_DECIMAL
     BOUNDARY_BOX = boundary_box
@@ -186,4 +196,7 @@ def find_matrix(boundary_box, tags, custom_circles_list):
 
     # use this matrix as final output
     FinalMatrix = matrix
-    return FinalMatrix
+    normalized_path_nodes = normalization_of_path_collection(
+        path_nodes, BOUNDARY_BOX)
+
+    return(FinalMatrix, normalized_path_nodes)

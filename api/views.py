@@ -28,7 +28,7 @@ KOTA
 {
 "source":[25.136582259755453,75.8163070678711],
 "destination":[ 25.186301620540558,75.87741851806639],
-"intermediate_stops":[],
+"intermediate_stops":[[25.154545,75.84234],[25.15523,75.8616256]],
 "buffer_radius_km":1,
 "tags":{"flyzone":true,"water":true,"forest":true,"school_hospitals":true,"population":true},
 "custom_restriction_markers":[[25.15523,75.8616256,100]]
@@ -52,17 +52,16 @@ class FindPathView(APIView):
         tags = request.data.get("tags")
         custom_restriction_markers = request.data.get(
             "custom_restriction_markers")
-        print(request.data)
         # check validity of points
         try:
             # finding boundaries of area for data extraction.
             path_list = request.data.get("intermediate_stops")
-            path_list += [source, destination]
+            path_nodes = [source]+path_list+[destination]
             minix = 99999
             miniy = 99999
             maxix = -99999
             maxiy = -99999
-            for i in path_list:
+            for i in path_nodes:
                 if(i[0] < minix):
                     minix = i[0]
                 if(i[1] < miniy):
@@ -79,16 +78,16 @@ class FindPathView(APIView):
             point1[1] -= 0.01*(buffer_radius)
             point2[0] += 0.01*(buffer_radius)
             point2[1] += 0.01*(buffer_radius)
-            print(point1, point2)
         except:
             print("problem in input json data.")
             return Response({"error": "problem in input json data or accessing data elements at server."}, status=HTTP_400_BAD_REQUEST)
         boundary_box = point1+point2
-        matrix = find_matrix(boundary_box, tags, custom_restriction_markers)
+        # this returns matrix and points corresponding in matrix normalization.
+
+        matrix, normalized_path_nodes = find_matrix(
+            boundary_box, tags, custom_restriction_markers, path_nodes)
         print("raster matrix formation successfull.")
-        try:
-            result_dict = find_shortest_path(matrix)
-        except:
-            return Response({"error": "problem in finding shortest path function at server."}, status=HTTP_400_BAD_REQUEST)
+        result_dict = find_shortest_path(
+            matrix, normalized_path_nodes)
 
         return Response(json.dumps(result_dict), status=HTTP_200_OK)
