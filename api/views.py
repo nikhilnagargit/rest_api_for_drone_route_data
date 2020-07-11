@@ -9,7 +9,7 @@ import json
 
 '''
 
-KOTA
+sample json required
 
 {
 "source":[25.136582259755453,75.8163070678711],
@@ -77,4 +77,4 @@ class FindPathView(APIView):
         result_dict = find_shortest_path(
             matrix, normalized_path_nodes, optimum_path)
 
-        return Response(json.dumps(result_dict), status=HTTP_200_OK)
+        return Response(result_dict, status=HTTP_200_OK)

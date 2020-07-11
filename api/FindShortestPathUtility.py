@@ -527,6 +527,7 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
     output = matrix
     ans = {}
     optimum = optimum_bool
+    final_path, final_path_lat_lon = [], []
     start_point = normalized_path_nodes[0]
     final_point = normalized_path_nodes[-1]
     points = normalized_path_nodes[1:-1]
@@ -549,6 +550,7 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
             forest_matrix[row][column] = output[row][column]['f']
             if(output[row][column]['s_h'] == 1 or output[row][column]['c'] == 1):
                 building_matrix[row][column] = 1
+                plt.scatter(row, column)
             else:
                 building_matrix[row][column] = 0
             population_matrix[row][column] = output[row][column]['p']
@@ -587,7 +589,7 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
             total_points = [start_point]
             total_points = optimum_path(total_points, points, final_point)
             for point in total_points:
-                plt.scatter(point[1], point[0], s=100)
+                plt.scatter(point[1], point[0], s=200)
                 p = "(" + str(point[0]) + " , " + str(point[1]) + ")"
                 plt.annotate(p, (point[1], point[0]))
             for i in range(0, len(total_points) - 1):
@@ -599,7 +601,7 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
                     for i in path:
                         x.append(i[1])
                         y.append(i[0])
-                    plt.plot(x, y)
+                    # plt.plot(x, y)
                 else:
                     print("No possible path")
         else:
@@ -610,7 +612,7 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
             total_points = optimum_path(total_points, points, start_point)
 
             for point in total_points:
-                plt.scatter(point[1], point[0], s=100)
+                plt.scatter(point[1], point[0], s=200)
                 p = "(" + str(point[0]) + " , " + str(point[1]) + ")"
                 plt.annotate(p, (point[1], point[0]))
 
@@ -625,7 +627,8 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
                         y.append(i[0])
                     plt.plot(x, y)
                 else:
-                    print("No possible path")
+                    print("No possibel path")
+                    return {"error": "No possible path"}
             total_points.reverse()
     else:
         start_point = normalized_path_nodes[0]
@@ -636,8 +639,8 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
             total_points.append(p)
         total_points.append(final_point)
         for point in total_points:
-            plt.scatter(point[1], point[0], s=100)
-            p = "("+str(point[0])+" , "+str(point[1])+")"
+            plt.scatter(point[1], point[0], s=200)
+            p = "(" + str(point[0]) + " , " + str(point[1]) + ")"
             plt.annotate(p, (point[1], point[0]))
         for i in range(0, len(total_points)-1):
             distance, path = shortest_path(
@@ -648,13 +651,33 @@ def find_shortest_path(matrix, normalized_path_nodes, optimum_bool):
                 for i in path:
                     x.append(i[1])
                     y.append(i[0])
-                plt.plot(x, y)
+                plt.scatter(x, y)
             else:
                 print("No possible path")
+                return {"error": "No possible path"}
+
+    for i in range(0, len(total_points)-1):
+        point_dis, point_path = shortest_path(
+            total_points[i][0], total_points[i][1], total_points[i+1][0], total_points[i+1][1])
+        for j in point_path:
+            final_path.append(j)
+
     lat_lon_path = get_lat_lon_path(total_points)
-    ans['route'] = lat_lon_path
-    print(total_distance_km)
-    print(total_points)
-    print(lat_lon_path)
+    plt.scatter(list(
+        map(lambda x: x[1], final_path)), list(map(lambda x: x[0], final_path)))
+    final_path_lat_lon = get_lat_lon_path(final_path)
+
+    print("Total distance", total_distance_km, "units")
+    print("\nPath Points Latitude & Longitude")
+    # print(lat_lon_path)
+    # print("\nTotal Path Points")
+    # print(final_path)
+    # print("\nPath Points Latitude & Longitude")
+    # print(final_path_lat_lon)
+    print("\nTotal number of pixels travelled", len(final_path_lat_lon))
+    print("point_dis", point_dis)
+
+    ans['final_path'] = final_path_lat_lon
+    ans['intermediate_stops'] = lat_lon_path
     plt.show()
     return ans
